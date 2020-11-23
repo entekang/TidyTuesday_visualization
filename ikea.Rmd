@@ -1,0 +1,66 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+What relationship exists between the designers in a category? Which categories had the most designers, where does a designer focus his/her work?  
+
+```{r}
+library(tidyverse)
+library(ghibli)
+library(extrafont)
+```
+
+
+
+```{r, message = F, warning = F}
+ikea <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-11-03/ikea.csv')
+n_distinct(ikea$designer)
+sapply(ikea, function(x) sum(is.na(x)))
+```
+
+Numerous missing values for depth, height and width. 
+There are some issues with the designer column, which needs to be fixed
+```{r}
+ik1 <- ikea %>% 
+  mutate(designer = str_split(as.character(designer), "/")) %>% 
+  unnest(designer) %>% 
+  filter(!str_detect(designer, "\\d")) %>%  # remove the designers with phone numbers in the designer name 
+  filter(!designer == "IKEA of Sweden") %>%
+  count(designer, category) %>% 
+  group_by(designer) %>%
+  mutate(total_designs = sum(n)) %>%        # the median number of designs is 28
+  filter(total_designs >= 50) %>% 
+  group_by(category) %>% 
+  mutate(total_designers = n_distinct(designer))
+```
+
+```{r}
+ggplot(ik1, aes(x=fct_reorder(category, desc(total_designers)), y = fct_reorder(designer, total_designs), size = n)) +
+  geom_point(colour = "yellow") +
+  labs(title = "Designers of IKEA Furniture", subtitle = "What were each designers' specialties?", size = "Number of Designs",
+       caption = "#TidyTuesday week 45 | Ente Kang") +
+  theme(
+    plot.margin = margin(30, 20, 30, 20),
+    panel.background = element_blank(), 
+    plot.background = element_rect(fill = "#5C5992FF", color = "#5C5992FF"), 
+    axis.text.x = element_text(colour = "white", size = 12, angle = 90, vjust = 0.55, family = "Georgia"), 
+    axis.text.y = element_text(colour = "white", size = 12, family = "Georgia"),
+    plot.title = element_text(colour = "white", size = 18, hjust = 0.5, family = "Georgia Bold"),
+    plot.subtitle = element_text(colour = "white", size = 14, hjust = 0.5, margin = margin(0, 0, 20, 0), family = "Georgia Italic"),
+    axis.title.y = element_blank(),
+    axis.title.x = element_blank(),
+    panel.grid.major = element_line(linetype = "dotted", color = "#446590FF"), 
+    legend.direction = "horizontal",
+    legend.background = element_rect(fill = "#5C5992FF"), 
+    legend.key = element_rect(fill = "#5C5992FF"), 
+    legend.text = element_text(colour = "white", family = "Georgia"), 
+    legend.title = element_text(colour = "white"),
+    plot.caption = element_text(colour = "white", size = 14, hjust = 1, family = "Georgia"),
+  )+
+  scale_color_viridis(option = "plasma")
+```
+```{r}
+ggsave(filename = "Ikea.png", width = 300, height = 400, units = "mm")
+```
+
