@@ -2,6 +2,7 @@
 
 
 **Week 49 (2020)**
+![](https://github.com/entekang/TidyTuesday_visualization/blob/main/toronto_support.png)  
 
 **Week 48 (2020)**
 ![](https://github.com/entekang/TidyTuesday_visualization/blob/main/hiking.png)  
