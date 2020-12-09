@@ -1,5 +1,7 @@
 # Visualizations from the TidyTuesday weekly datasets
 
+**Week 50 (2020)**
+![](https://github.com/entekang/TidyTuesday_visualization/blob/main/women_2020.png)  
 
 **Week 49 (2020)**
 ![](https://github.com/entekang/TidyTuesday_visualization/blob/main/toronto_support.png)  
